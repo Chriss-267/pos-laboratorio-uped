@@ -35,7 +35,7 @@ Puedes consultar el avance, la organización de tareas y el flujo de trabajo del
 ## 📁 Estructura del Proyecto
 
 ```text
-lab1-integracionsistemas-[nombreequipo]/
+lab1-pos-laboratorio-uped-[Greener]/
 ├── src/
 │   └── app/
 │       ├── Config/
