@@ -1,7 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 
-use App\Controllers\PersonaController;
+use App\Controllers\ClienteController;
 
-$personaController = new PersonaController();
-$personaController->index();
+$clienteController = new ClienteController();
+$clienteController->index();

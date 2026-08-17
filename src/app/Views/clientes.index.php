@@ -17,12 +17,12 @@
     <th>Correo</th>
     <th>Contraseña</th>
     </tr>
-    <?php foreach ($personas as $persona) ?>
+    <?php foreach ($cliente as $cliente) ?>
         <tr>
-        <td><?= $persona->id ?></td>
-        <td><?= $persona->nombre ?></td>
-        <td><?= $persona->correo ?></td>
-        <td><?= $persona->contraseña ?></td>
+        <td><?= $cliente->id ?></td>
+        <td><?= $cliente->nombre ?></td>
+        <td><?= $cliente->correo ?></td>
+        <td><?= $cliente->contraseña ?></td>
         </tr>
 
     <?php ?>

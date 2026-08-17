@@ -6,15 +6,15 @@ namespace App\Models;
 use App\Config\Database;
 use PDO;
 
-class Persona {
+class Cliente {
     
-    //atributos de persona
+    //atributos de cliente
     private $id;
     private $nombre;
     private $correo;
     private $contraseña;
 
-    //contructor de la clase persona
+    //contructor de la clase cliente
     public function __construct($id = 0, $nombre = '', $correo = '', $contraseña = '') {
         $this->id = $id;
         $this->nombre = $nombre;
@@ -22,7 +22,7 @@ class Persona {
         $this->contraseña = $contraseña;
     }
     
-    //getters y setters de persona
+    //getters y setters de cliente
     public function getId() {
         return $this->id;
     }
@@ -55,20 +55,20 @@ class Persona {
         $this->contraseña = $contraseña;
     }
 
-    // metodo para crear una persona conectado a la base con prepare y luego ejecutar la consulta
-    public function crearPersona(string $nombre, string $correo, string $contraseña) {
+    // metodo para crear un cliente conectado a la base con prepare y luego ejecutar la consulta
+    public function crearCliente(string $nombre, string $correo, string $contraseña) {
        $conexion = new Database();
-       $conexion->getConnection()->prepare("INSERT INTO usuarios (nombre, correo, contraseña) VALUES (:nombre, :correo, :contraseña)")->execute([
+       $conexion->getConnection()->prepare("INSERT INTO clientes (nombre, correo, contraseña) VALUES (:nombre, :correo, :contraseña)")->execute([
            ':nombre' => $nombre,
            ':correo' => $correo,
            ':contraseña' => $contraseña
        ]);
     }
 
-    //metodo para obtener todas las personas con prepare y luego ejecutar la consulta
-    public function carlitos() {
+    //metodo para obtener todos los clientes con prepare y luego ejecutar la consulta
+    public function listarCliente() {
         $conexion = new Database();
-        $stmt = $conexion->getConnection()->prepare("SELECT * FROM usuarios");
+        $stmt = $conexion->getConnection()->prepare("SELECT * FROM clientes");
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_CLASS);
