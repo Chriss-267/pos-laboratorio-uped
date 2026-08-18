@@ -1,6 +1,6 @@
 <?php
 
-// clase padre persona entidad
+
 namespace App\Models;
 
 use App\Config\Database;
@@ -58,10 +58,10 @@ class Cliente {
     // metodo para crear un cliente conectado a la base con prepare y luego ejecutar la consulta
     public function crearCliente(string $nombre, string $correo, string $contraseña) {
        $conexion = new Database();
-       $conexion->getConnection()->prepare("INSERT INTO clientes (nombre, correo, contraseña) VALUES (:nombre, :correo, :contraseña)")->execute([
+       $conexion->getConnection()->prepare("INSERT INTO clientes (nombre, correo, contraseña) VALUES (:nombre, :correo, :contrasena)")->execute([
            ':nombre' => $nombre,
            ':correo' => $correo,
-           ':contraseña' => $contraseña
+           ':contrasena' => $contraseña
        ]);
     }
 
@@ -71,7 +71,7 @@ class Cliente {
         $stmt = $conexion->getConnection()->prepare("SELECT * FROM clientes");
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_CLASS);
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
 
     }
 
