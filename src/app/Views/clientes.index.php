@@ -161,6 +161,7 @@
             .main-container {
                 flex-direction: column;
             }
+
             .left-column {
                 max-width: 100%;
             }
@@ -182,19 +183,23 @@
             <!-- Formulario con GET -->
             <div class="form-card">
                 <h2>Registrar Cliente</h2>
+
                 <form action="index.php" method="GET">
                     <div class="form-group">
                         <label for="nombre">Nombre Completo:</label>
                         <input type="text" id="nombre" name="nombre" required placeholder="Ej. Juan Pérez">
                     </div>
+
                     <div class="form-group">
                         <label for="correo">Correo Electrónico:</label>
                         <input type="email" id="correo" name="correo" required placeholder="usuario@correo.com">
                     </div>
+
                     <div class="form-group">
                         <label for="contraseña">Contraseña:</label>
                         <input type="password" id="contraseña" name="contraseña" required placeholder="••••••••">
                     </div>
+
                     <button type="submit" class="btn-submit">Guardar Registro</button>
                 </form>
             </div>
@@ -212,25 +217,41 @@
                         <th>Nombre</th>
                         <th>Correo</th>
                         <th>Contraseña</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     <?php if (!empty($clientes)): ?>
+
                         <?php foreach ($clientes as $c): ?>
                             <tr>
                                 <td><?= htmlspecialchars($c->id) ?></td>
                                 <td><?= htmlspecialchars($c->nombre) ?></td>
                                 <td><?= htmlspecialchars($c->correo) ?></td>
                                 <td><?= htmlspecialchars($c->contraseña) ?></td>
+
+                                <!-- PARTE DE STANLEY: ELIMINAR CLIENTE -->
+                                <td>
+                                    <a href="index.php?accion=eliminar&id=<?= $c->id ?>"
+                                       onclick="return confirm('¿Está seguro de eliminar este cliente?');">
+                                        Eliminar
+                                    </a>
+                                </td>
+
                             </tr>
                         <?php endforeach; ?>
+
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" class="no-data">No se encontraron clientes en la base de datos.</td>
+                            <td colspan="5" class="no-data">
+                                No se encontraron clientes en la base de datos.
+                            </td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
+
         </div>
 
     </div>
