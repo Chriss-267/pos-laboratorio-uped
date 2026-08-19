@@ -155,6 +155,21 @@
             color: #888;
             padding: 20px;
         }
+        .btn-delete {
+            display: inline-block;
+            background-color: #dc3545;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #b02a37;
+}
 
         /* Responsivo en pantallas pequeñas */
         @media (max-width: 768px) {
@@ -233,7 +248,8 @@
 
                                 <!-- PARTE DE STANLEY: ELIMINAR CLIENTE -->
                                 <td>
-                                    <a href="index.php?accion=eliminar&id=<?= $c->id ?>"
+                                    <a class="btn-delete"
+                                       href="index.php?accion=eliminar&id=<?= $c->id ?>"
                                        onclick="return confirm('¿Está seguro de eliminar este cliente?');">
                                         Eliminar
                                     </a>
