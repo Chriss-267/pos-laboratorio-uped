@@ -7,25 +7,30 @@
 </head>
 <body>
 
-
-
-
 <table style="background-color: green;">
     <tr style="background-color: black; color:white">
     <th>ID</th>
     <th>Nombre</th>
     <th>Correo</th>
     <th>Contraseña</th>
+    <th>Acciones</th>
     </tr>
-    <?php foreach ($cliente as $cliente) ?>
-        <tr>
-        <td><?= $cliente->id ?></td>
-        <td><?= $cliente->nombre ?></td>
-        <td><?= $cliente->correo ?></td>
-        <td><?= $cliente->contraseña ?></td>
-        </tr>
 
-    <?php ?>
+    <?php foreach ($cliente as $item) { ?>
+        <tr>
+        <td><?= $item->id ?></td>
+        <td><?= $item->nombre ?></td>
+        <td><?= $item->correo ?></td>
+        <td><?= $item->contraseña ?></td>
+        <td>
+            <a href="index.php?accion=eliminar&id=<?= $item->id ?>"
+               onclick="return confirm('¿Está seguro de eliminar este cliente?');">
+                Eliminar
+            </a>
+        </td>
+        </tr>
+    <?php } ?>
+
     </table> 
 </body>
 </html>

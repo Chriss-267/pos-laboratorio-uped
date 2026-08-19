@@ -74,6 +74,18 @@ class Cliente {
         return $stmt->fetchAll(PDO::FETCH_CLASS);
 
     }
+    public function eliminarCliente(int $id)
+{
+    $conexion = new Database();
+
+    $stmt = $conexion->getConnection()->prepare(
+        "DELETE FROM clientes WHERE id = :id"
+    );
+
+    return $stmt->execute([
+        ':id' => $id
+    ]);
+}
 
 
 }
