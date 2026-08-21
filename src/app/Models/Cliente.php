@@ -1,91 +1,73 @@
 <?php
 
-
 namespace App\Models;
 
 use App\Config\Database;
+use App\Interfaces\ClienteInterface;
 use PDO;
 
-class Cliente {
-    
-    //atributos de cliente
-    private $id;
-    private $nombre;
-    private $correo;
-    private $contraseña;
+class Cliente extends Persona implements ClienteInterface
+{
+    private $documento;
 
-    //contructor de la clase cliente
-    public function __construct($id = 0, $nombre = '', $correo = '', $contraseña = '') {
-        $this->id = $id;
-        $this->nombre = $nombre;
-        $this->correo = $correo;
-        $this->contraseña = $contraseña;
-    }
-    
-    //getters y setters de cliente
-    public function getId() {
-        return $this->id;
+    public function __construct($id = 0, $nombre = '', $correo = '', $telefono = '', $direccion = '', $documento = '')
+    {
+        parent::__construct($id, $nombre, $correo, $telefono, $direccion);
+        $this->documento = $documento;
     }
 
-    public function setId($id) {
-        $this->id = $id;
+    public function getDocumento()
+    {
+        return $this->documento;
     }
 
-    public function getNombre() {
-        return $this->nombre;
+    public function setDocumento($documento)
+    {
+        $this->documento = trim($documento);
     }
 
-    public function setNombre($nombre) {
-        $this->nombre = $nombre;
-    }
-
-    public function getCorreo() {
-        return $this->correo;
-    }
-
-    public function setCorreo($correo) {
-        $this->correo = $correo;
-    }
-
-    public function getContraseña() {
-        return $this->contraseña;
-    }
-
-    public function setContraseña($contraseña) {
-        $this->contraseña = $contraseña;
-    }
-
-    // metodo para crear un cliente conectado a la base con prepare y luego ejecutar la consulta
-    public function crearCliente(string $nombre, string $correo, string $contraseña) {
-       $conexion = new Database();
-       $conexion->getConnection()->prepare("INSERT INTO clientes (nombre, correo, contraseña) VALUES (:nombre, :correo, :contrasena)")->execute([
-           ':nombre' => $nombre,
-           ':correo' => $correo,
-           ':contrasena' => $contraseña
-       ]);
-    }
-
-    //metodo para obtener todos los clientes con prepare y luego ejecutar la consulta
-    public function listarCliente() {
+    /**
+     * Obtiene la lista completa de clientes ordenados por ID descendente.
+     */
+    public function listarTodos(): array
+    {
         $conexion = new Database();
-        $stmt = $conexion->getConnection()->prepare("SELECT * FROM clientes");
+        $stmt = $conexion->getConnection()->prepare("SELECT * FROM clientes ORDER BY id DESC");
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_OBJ);
-
     }
-    public function eliminarCliente(int $id)
-{
-    $conexion = new Database();
 
-    $stmt = $conexion->getConnection()->prepare(
-        "DELETE FROM clientes WHERE id = :id"
-    );
+    /**
+     * Inserta un nuevo cliente en la base de datos.
+     */
+    public function crear(Cliente $cliente): bool
+    {
+        $conexion = new Database();
+        $stmt = $conexion->getConnection()->prepare(
+            "INSERT INTO clientes (nombre, correo, telefono, direccion, documento) 
+             VALUES (:nombre, :correo, :telefono, :direccion, :documento)"
+        );
 
-    return $stmt->execute([
-        ':id' => $id
-    ]);
-}
+        return $stmt->execute([
+            ':nombre'    => $cliente->getNombre(),
+            ':correo'    => $cliente->getCorreo(),
+            ':telefono'  => $cliente->getTelefono(),
+            ':direccion' => $cliente->getDireccion(),
+            ':documento' => $cliente->getDocumento()
+        ]);
+    }
 
+    /**
+     * Elimina un cliente según su ID.
+     */
+    public function eliminar(int $id): bool
+    {
+        $conexion = new Database();
+        $stmt = $conexion->getConnection()->prepare("DELETE FROM clientes WHERE id = :id");
 
+        return $stmt->execute([
+            ':id' => $id
+        ]);
+    }
 }
