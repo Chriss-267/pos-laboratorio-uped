@@ -39,6 +39,20 @@ class Cliente extends Persona implements ClienteInterface
     }
 
     /**
+     * Busca un cliente por su ID.
+     */
+    public function buscarPorId(int $id)
+    {
+        $conexion = new Database();
+        $stmt = $conexion->getConnection()->prepare("SELECT * FROM clientes WHERE id = :id LIMIT 1");
+        $stmt->execute([':id' => $id]);
+
+        $cliente = $stmt->fetch(PDO::FETCH_OBJ);
+
+        return $cliente ?: null;
+    }
+
+    /**
      * Inserta un nuevo cliente en la base de datos.
      */
     public function crear(Cliente $cliente): bool
@@ -55,6 +69,32 @@ class Cliente extends Persona implements ClienteInterface
             ':telefono'  => $cliente->getTelefono(),
             ':direccion' => $cliente->getDireccion(),
             ':documento' => $cliente->getDocumento()
+        ]);
+    }
+
+    /**
+     * Actualiza los datos de un cliente existente.
+     */
+    public function actualizar(Cliente $cliente): bool
+    {
+        $conexion = new Database();
+        $stmt = $conexion->getConnection()->prepare(
+            "UPDATE clientes 
+                SET nombre = :nombre, 
+                    correo = :correo, 
+                    telefono = :telefono, 
+                    direccion = :direccion, 
+                    documento = :documento 
+              WHERE id = :id"
+        );
+
+        return $stmt->execute([
+            ':nombre'    => $cliente->getNombre(),
+            ':correo'    => $cliente->getCorreo(),
+            ':telefono'  => $cliente->getTelefono(),
+            ':direccion' => $cliente->getDireccion(),
+            ':documento' => $cliente->getDocumento(),
+            ':id'        => $cliente->getId()
         ]);
     }
 
