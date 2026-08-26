@@ -25,4 +25,12 @@ interface ClienteInterface
      * @return bool
      */
     public function eliminar(int $id): bool;
+
+    /**
+     * Actualiza parcialmente (PATCH) un cliente existente.
+     * @param int   $id     ID del cliente a actualizar.
+     * @param array $campos Arreglo columna => valor, solo con los campos modificados.
+     * @return bool
+     */
+    public function editar(int $id, array $campos): bool;
 }

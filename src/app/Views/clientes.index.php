@@ -261,6 +261,61 @@
             border-color: var(--danger-color);
         }
 
+        .btn-edit {
+            background-color: #eef4ff;
+            color: var(--accent-color);
+            border: 1px solid #bcd4fb;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 6px;
+        }
+
+        .btn-edit:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* Fila de botones del formulario (Guardar/Actualizar + Cancelar) */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .form-actions .btn-submit {
+            margin-top: 0;
+        }
+
+        /* Botón cancelar (solo visible en modo edición) */
+        .btn-cancel {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Resalta la tarjeta del formulario cuando estás editando */
+        .form-card.modo-edicion {
+            box-shadow: 0 0 0 2px var(--accent-color), var(--card-shadow);
+        }
+
         /* Responsivo */
         @media (max-width: 992px) {
             .main-container {
@@ -294,11 +349,11 @@
                 <img src="https://res.cloudinary.com/bcwlyire/image/upload/v1785118882/NUEVO-LOGO-UPED-A-COLOR-scaled_szoqws.jpg" alt="Logo UPED">
             </div>
 
-            <!-- Formulario POST -->
-            <div class="form-card">
-                <h2><i class="fa-solid fa-user-plus"></i> Registrar Cliente</h2>
+            <!-- Formulario doble propósito: CREAR (POST) o EDITAR (PATCH) -->
+            <div class="form-card" id="form-card">
+                <h2 id="form-titulo"><i class="fa-solid fa-user-plus"></i> Registrar Cliente</h2>
 
-                <form action="index.php?accion=crear" method="POST">
+                <form action="index.php?accion=crear" method="POST" id="form-cliente">
                     <div class="form-group">
                         <label for="nombre">Nombre Completo *</label>
                         <input type="text" id="nombre" name="nombre" required placeholder="Ej. Juan Pérez">
@@ -324,9 +379,14 @@
                         <input type="text" id="direccion" name="direccion" placeholder="Ej. San Salvador, El Salvador">
                     </div>
 
-                    <button type="submit" class="btn-submit">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Cliente
-                    </button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="btn-principal">
+                            <i class="fa-solid fa-floppy-disk"></i> <span id="btn-texto">Guardar Cliente</span>
+                        </button>
+                        <button type="button" class="btn-cancel" id="btn-cancelar" onclick="cancelarEdicion()" style="display: none;">
+                            Cancelar
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -363,6 +423,16 @@
                                 <td><?= htmlspecialchars($c->telefono ?? 'N/A') ?></td>
                                 <td><?= htmlspecialchars($c->direccion ?? 'N/A') ?></td>
                                 <td>
+                                    <button class="btn-edit"
+                                        data-id="<?= htmlspecialchars($c->id) ?>"
+                                        data-nombre="<?= htmlspecialchars($c->nombre) ?>"
+                                        data-documento="<?= htmlspecialchars($c->documento ?? '') ?>"
+                                        data-correo="<?= htmlspecialchars($c->correo) ?>"
+                                        data-telefono="<?= htmlspecialchars($c->telefono ?? '') ?>"
+                                        data-direccion="<?= htmlspecialchars($c->direccion ?? '') ?>"
+                                        onclick="editarCliente(this)">
+                                        <i class="fa-solid fa-pen"></i> Editar
+                                    </button>
                                     <button class="btn-delete" onclick="confirmarEliminacion(<?= $c->id ?>, '<?= htmlspecialchars(addslashes($c->nombre)) ?>')">
                                         <i class="fa-solid fa-trash-can"></i> Eliminar
                                     </button>
@@ -402,6 +472,104 @@
                 }
             });
         }
+
+        // Lista de campos que maneja el formulario.
+        const CAMPOS = ['nombre', 'documento', 'correo', 'telefono', 'direccion'];
+
+        // Guarda los valores ORIGINALES del cliente en edición (para saber qué cambió).
+        // Si es null, el formulario está en modo "crear".
+        let clienteEnEdicion = null;
+
+        // Al pulsar "Editar": llena el formulario de la izquierda con los datos del cliente.
+        function editarCliente(btn) {
+            clienteEnEdicion = {
+                id:        btn.dataset.id,
+                nombre:    btn.dataset.nombre,
+                documento: btn.dataset.documento,
+                correo:    btn.dataset.correo,
+                telefono:  btn.dataset.telefono,
+                direccion: btn.dataset.direccion
+            };
+
+            // Cargamos cada dato en su campo del formulario.
+            CAMPOS.forEach(campo => {
+                document.getElementById(campo).value = clienteEnEdicion[campo];
+            });
+
+            // Cambiamos el formulario a "modo edición".
+            document.getElementById('form-titulo').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Cliente';
+            document.getElementById('btn-texto').textContent = 'Actualizar Cliente';
+            document.getElementById('btn-cancelar').style.display = 'block';
+            document.getElementById('form-card').classList.add('modo-edicion');
+
+            // Llevamos la vista al formulario (útil en móvil o listas largas).
+            document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Vuelve el formulario a "modo crear".
+        function cancelarEdicion() {
+            clienteEnEdicion = null;
+            document.getElementById('form-cliente').reset();
+            document.getElementById('form-titulo').innerHTML = '<i class="fa-solid fa-user-plus"></i> Registrar Cliente';
+            document.getElementById('btn-texto').textContent = 'Guardar Cliente';
+            document.getElementById('btn-cancelar').style.display = 'none';
+            document.getElementById('form-card').classList.remove('modo-edicion');
+        }
+
+        // Interceptamos el envío del formulario.
+        document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+            // Si NO estamos editando, dejamos que el formulario cree el cliente (POST normal).
+            if (!clienteEnEdicion) {
+                return;
+            }
+
+            // --- MODO EDICIÓN: enviamos un PATCH con SOLO los campos que cambiaron ---
+            e.preventDefault();
+
+            const cambios = new URLSearchParams();
+            CAMPOS.forEach(campo => {
+                const valorActual = document.getElementById(campo).value.trim();
+                // Solo incluimos el campo si es distinto al valor original.
+                if (valorActual !== clienteEnEdicion[campo]) {
+                    cambios.append(campo, valorActual);
+                }
+            });
+
+            // Si no cambió nada, no enviamos petición.
+            if ([...cambios.keys()].length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin cambios',
+                    text: 'No modificaste ningún dato del cliente.'
+                });
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`index.php?accion=editar&id=${clienteEnEdicion.id}`, {
+                    method: 'PATCH', // ← verbo PATCH real (visible en la pestaña Red)
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: cambios.toString()
+                });
+                const data = await respuesta.json();
+
+                if (data.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Cliente Actualizado!',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargamos para ver la tabla con los datos actualizados.
+                    window.location.href = 'index.php';
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo contactar al servidor.' });
+            }
+        });
 
         // Manejo de alertas emergentes enviadas desde el controlador
         document.addEventListener('DOMContentLoaded', () => {
