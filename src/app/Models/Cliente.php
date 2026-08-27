@@ -110,4 +110,40 @@ class Cliente extends Persona implements ClienteInterface
             ':id' => $id
         ]);
     }
+
+    /**
+     * Actualiza PARCIALMENTE un cliente (semántica PATCH).
+     *
+     * Solo modifica las columnas presentes en $campos; el resto de la fila
+     * permanece intacta. El SET se construye dinámicamente a partir de las
+     * claves recibidas.
+     *
+     * @param int   $id     ID del cliente a actualizar.
+     * @param array $campos Arreglo asociativo columna => valor, solo con lo que cambió.
+     */
+    public function editar(int $id, array $campos): bool
+    {
+        if (empty($campos)) {
+            return false;
+        }
+
+        // Construimos el "SET" dinámicamente solo con los campos recibidos.
+        // Nota: las claves de $campos provienen de una lista blanca en el
+        // controlador, por eso es seguro usarlas como nombres de columna.
+        $asignaciones = [];
+        $parametros   = [];
+
+        foreach ($campos as $columna => $valor) {
+            $asignaciones[] = "{$columna} = :{$columna}";
+            $parametros[":{$columna}"] = $valor;
+        }
+        $parametros[':id'] = $id;
+
+        $sql = "UPDATE clientes SET " . implode(', ', $asignaciones) . " WHERE id = :id";
+
+        $conexion = new Database();
+        $stmt = $conexion->getConnection()->prepare($sql);
+
+        return $stmt->execute($parametros);
+    }
 }

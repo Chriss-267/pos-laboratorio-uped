@@ -28,6 +28,11 @@ switch ($accion) {
         $clienteController->eliminar($id);
         break;
 
+    case 'editar':
+        $id = $_GET['id'] ?? null;
+        $clienteController->editar($id);
+        break;
+
     case 'index':
     default:
         $clienteController->index();

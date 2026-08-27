@@ -41,17 +41,21 @@ $valDireccion = $editando ? $clienteEditar->direccion : '';
                 <img src="https://res.cloudinary.com/bcwlyire/image/upload/v1785118882/NUEVO-LOGO-UPED-A-COLOR-scaled_szoqws.jpg" alt="Logo UPED">
             </div>
 
-            <!-- Formulario POST -->
-            <div class="form-card">
-                <h2>
+            <!-- Formulario de doble propósito:
+                   - CREAR (POST) y EDITAR por PUT -> envío normal del formulario.
+                   - EDITAR por PATCH -> el JS intercepta el submit y usa fetch.
+                 El modo PUT lo activa el servidor ($editando); el modo PATCH, el JS. -->
+            <div class="form-card" id="form-card">
+                <h2 id="form-titulo">
                     <i class="fa-solid <?= $editando ? 'fa-user-pen' : 'fa-user-plus' ?>"></i>
                     <?= $editando ? 'Editar Cliente' : 'Registrar Cliente' ?>
                     <?php if ($editando): ?>
-                        <span class="badge-editando">#<?= htmlspecialchars($clienteEditar->id) ?></span>
+                        <span class="badge-editando">PUT #<?= htmlspecialchars($clienteEditar->id) ?></span>
                     <?php endif; ?>
                 </h2>
 
-                <form action="<?= $editando ? 'index.php?accion=actualizar&id=' . htmlspecialchars($clienteEditar->id) : 'index.php?accion=crear' ?>" method="POST">
+                <form id="form-cliente" method="POST"
+                      action="<?= $editando ? 'index.php?accion=actualizar&id=' . htmlspecialchars($clienteEditar->id) : 'index.php?accion=crear' ?>">
 
                     <?php if ($editando): ?>
                         <!-- Los formularios HTML solo envían GET o POST,
@@ -84,12 +88,20 @@ $valDireccion = $editando ? $clienteEditar->direccion : '';
                         <input type="text" id="direccion" name="direccion" placeholder="Ej. San Salvador, El Salvador" value="<?= htmlspecialchars($valDireccion) ?>">
                     </div>
 
-                    <button type="submit" class="btn-submit">
-                        <i class="fa-solid <?= $editando ? 'fa-rotate' : 'fa-floppy-disk' ?>"></i>
-                        <?= $editando ? 'Actualizar Cliente' : 'Guardar Cliente' ?>
-                    </button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="btn-principal">
+                            <i class="fa-solid <?= $editando ? 'fa-rotate' : 'fa-floppy-disk' ?>"></i>
+                            <span id="btn-texto"><?= $editando ? 'Actualizar Cliente' : 'Guardar Cliente' ?></span>
+                        </button>
+
+                        <!-- Cancelar del modo PATCH: el JS lo muestra y lo oculta -->
+                        <button type="button" class="btn-cancel" id="btn-cancelar" onclick="cancelarEdicion()" style="display: none;">
+                            Cancelar
+                        </button>
+                    </div>
 
                     <?php if ($editando): ?>
+                        <!-- Cancelar del modo PUT: basta con volver al index sin ?id -->
                         <a href="index.php" class="btn-cancelar">
                             <i class="fa-solid fa-xmark"></i> Cancelar edición
                         </a>
@@ -154,9 +166,24 @@ $valDireccion = $editando ? $clienteEditar->direccion : '';
                                 <td><?= htmlspecialchars($c->direccion ?? 'N/A') ?></td>
                                 <td>
                                     <div class="acciones">
-                                        <a href="index.php?id=<?= $c->id ?>" class="btn-edit">
-                                            <i class="fa-solid fa-pen-to-square"></i> Editar
+                                        <!-- Editar por PUT: recarga la página con el formulario ya lleno -->
+                                        <a href="index.php?id=<?= $c->id ?>" class="btn-edit" title="Editar enviando un PUT (recarga la página)">
+                                            <i class="fa-solid fa-pen-to-square"></i> PUT
                                         </a>
+
+                                        <!-- Editar por PATCH: llena el formulario sin recargar -->
+                                        <button class="btn-edit btn-edit-patch"
+                                            title="Editar enviando un PATCH (solo viajan los campos que cambien)"
+                                            data-id="<?= htmlspecialchars($c->id) ?>"
+                                            data-nombre="<?= htmlspecialchars($c->nombre) ?>"
+                                            data-documento="<?= htmlspecialchars($c->documento ?? '') ?>"
+                                            data-correo="<?= htmlspecialchars($c->correo) ?>"
+                                            data-telefono="<?= htmlspecialchars($c->telefono ?? '') ?>"
+                                            data-direccion="<?= htmlspecialchars($c->direccion ?? '') ?>"
+                                            onclick="editarCliente(this)">
+                                            <i class="fa-solid fa-pen"></i> PATCH
+                                        </button>
+
                                         <button class="btn-delete" onclick="confirmarEliminacion(<?= $c->id ?>, '<?= htmlspecialchars(addslashes($c->nombre)) ?>')">
                                             <i class="fa-solid fa-trash-can"></i> Eliminar
                                         </button>
@@ -197,6 +224,115 @@ $valDireccion = $editando ? $clienteEditar->direccion : '';
                 }
             });
         }
+
+        // Lista de campos que maneja el formulario.
+        const CAMPOS = ['nombre', 'documento', 'correo', 'telefono', 'direccion'];
+
+        // ¿El servidor abrió el formulario en modo PUT? (llegamos con ?id= en la URL)
+        const MODO_PUT = <?= $editando ? 'true' : 'false' ?>;
+
+        // Guarda los valores ORIGINALES del cliente en edición por PATCH (para saber qué cambió).
+        // Si es null, el formulario NO está en modo PATCH.
+        let clienteEnEdicion = null;
+
+        // Al pulsar "Editar": llena el formulario de la izquierda con los datos del cliente.
+        function editarCliente(btn) {
+            clienteEnEdicion = {
+                id:        btn.dataset.id,
+                nombre:    btn.dataset.nombre,
+                documento: btn.dataset.documento,
+                correo:    btn.dataset.correo,
+                telefono:  btn.dataset.telefono,
+                direccion: btn.dataset.direccion
+            };
+
+            // Cargamos cada dato en su campo del formulario.
+            CAMPOS.forEach(campo => {
+                document.getElementById(campo).value = clienteEnEdicion[campo];
+            });
+
+            // Cambiamos el formulario a "modo edición".
+            document.getElementById('form-titulo').innerHTML = '<i class="fa-solid fa-user-pen"></i> Editar Cliente';
+            document.getElementById('btn-texto').textContent = 'Actualizar Cliente';
+            document.getElementById('btn-cancelar').style.display = 'block';
+            document.getElementById('form-card').classList.add('modo-edicion');
+
+            // Llevamos la vista al formulario (útil en móvil o listas largas).
+            document.getElementById('form-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Vuelve el formulario a "modo crear".
+        function cancelarEdicion() {
+            // En modo PUT el formulario lo llenó el servidor: limpiarlo aquí dejaría
+            // la acción apuntando a "actualizar". Volvemos al index sin ?id.
+            if (MODO_PUT) {
+                window.location.href = 'index.php';
+                return;
+            }
+
+            clienteEnEdicion = null;
+            document.getElementById('form-cliente').reset();
+            document.getElementById('form-titulo').innerHTML = '<i class="fa-solid fa-user-plus"></i> Registrar Cliente';
+            document.getElementById('btn-texto').textContent = 'Guardar Cliente';
+            document.getElementById('btn-cancelar').style.display = 'none';
+            document.getElementById('form-card').classList.remove('modo-edicion');
+        }
+
+        // Interceptamos el envío del formulario.
+        document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+            // Sin PATCH activo dejamos pasar el envío normal del formulario:
+            // sirve tanto para CREAR (POST) como para EDITAR por PUT.
+            if (!clienteEnEdicion) {
+                return;
+            }
+
+            // --- MODO EDICIÓN: enviamos un PATCH con SOLO los campos que cambiaron ---
+            e.preventDefault();
+
+            const cambios = new URLSearchParams();
+            CAMPOS.forEach(campo => {
+                const valorActual = document.getElementById(campo).value.trim();
+                // Solo incluimos el campo si es distinto al valor original.
+                if (valorActual !== clienteEnEdicion[campo]) {
+                    cambios.append(campo, valorActual);
+                }
+            });
+
+            // Si no cambió nada, no enviamos petición.
+            if ([...cambios.keys()].length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin cambios',
+                    text: 'No modificaste ningún dato del cliente.'
+                });
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`index.php?accion=editar&id=${clienteEnEdicion.id}`, {
+                    method: 'PATCH', // ← verbo PATCH real (visible en la pestaña Red)
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: cambios.toString()
+                });
+                const data = await respuesta.json();
+
+                if (data.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: '¡Cliente Actualizado!',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargamos para ver la tabla con los datos actualizados.
+                    window.location.href = 'index.php';
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: data.message });
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Error de conexión', text: 'No se pudo contactar al servidor.' });
+            }
+        });
 
         // Manejo de alertas emergentes enviadas desde el controlador
         document.addEventListener('DOMContentLoaded', () => {

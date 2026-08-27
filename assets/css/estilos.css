@@ -380,3 +380,48 @@ tr.fila-editando {
     white-space: nowrap;
 }
 
+/* Botones de accion del formulario (modo PATCH) */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.form-actions .btn-submit {
+    margin-top: 0;
+}
+
+/* Cancelar del modo PATCH: solo visible cuando el JS activa la edicion */
+.btn-cancel {
+    background-color: #f1f5f9;
+    color: var(--text-muted);
+    border: none;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #e2e8f0;
+}
+
+/* Resalta la tarjeta del formulario mientras se edita por PATCH */
+.form-card.modo-edicion {
+    box-shadow: 0 0 0 2px var(--accent-color), var(--card-shadow);
+}
+
+/* Distingue el boton de editar por PATCH del de PUT */
+.btn-edit-patch {
+    background-color: #f5f3ff;
+    color: #6d28d9;
+    border-color: #ddd6fe;
+}
+
+.btn-edit-patch:hover {
+    background-color: #6d28d9;
+    color: white;
+    border-color: #6d28d9;
+}
