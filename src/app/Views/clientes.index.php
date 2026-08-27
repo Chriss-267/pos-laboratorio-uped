@@ -76,7 +76,7 @@ $valDireccion = $editando ? $clienteEditar->direccion : '';
 
                     <div class="form-group">
                         <label for="telefono">Teléfono *</label>
-                        <input type="text" id="telefono" name="telefono" required placeholder="Ej. 7777-8888" value="<?= htmlspecialchars($valTelefono) ?>">
+                        <input type="tel" id="telefono" name="telefono" required placeholder="Ej. 7777-8888" value="<?= htmlspecialchars($valTelefono) ?>">
                     </div>
 
                     <div class="form-group">

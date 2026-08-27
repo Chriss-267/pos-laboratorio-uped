@@ -60,6 +60,9 @@ class ClienteController
             $this->redirigir();
         }
 
+        //numero de telefono debe ser solo numeros sin espacios ni guiones ni nada
+        $datos['telefono'] = preg_replace('/[^0-9]/', '', $datos['telefono']);
+
         $nuevoCliente = new Cliente(
             0,
             $datos['nombre'],
