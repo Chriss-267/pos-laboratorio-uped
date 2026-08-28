@@ -6,12 +6,23 @@
 
 **Universidad Pedagógica de El Salvador Dr. Luis Alonso Aparicio**  
 **Facultad de Ingeniería**  
-**Asignatura:** Integración de Sistemas (`CE-ISC019`) — Ciclo 02-2026  
-**Grupo:** Bariloches  
+**Asignatura:** Integración de Sistemas (`CE-ISC019`) — Ciclo 02-2026   
+
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.2+"/>
+  <img src="https://img.shields.io/badge/MySQL-PDO-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL PDO"/>
+  <img src="https://img.shields.io/badge/Composer-Autoload-885630?style=for-the-badge&logo=composer&logoColor=white" alt="Composer"/>
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"/>
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"/>
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
+  <img src="https://img.shields.io/badge/Trello-0052CC?style=for-the-badge&logo=trello&logoColor=white" alt="Trello"/>
+  <img src="https://img.shields.io/badge/Claude_Code-D97706?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code"/>
+  <img src="https://img.shields.io/badge/Gemini-8E44AD?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini"/>
+</p>
 
 ---
 
-## 👥 Integrantes del Equipo
+## 👥 Los Bariloches
 
 * **Cruz Vásquez, Josthyn Stanley** — `CV-64711-23`
 * **Flores Molina, Carlos Ernesto** — `FM-63450-22`
@@ -38,8 +49,8 @@ Desarrollo de una solución **POS (Point of Sale)** para la automatización del 
 
 Para potenciar el desarrollo y documentación del proyecto, se integraron herramientas de IA generativa en áreas específicas:
 
-* **Claude:** Utilizado como asistente de diseño para la maquetación visual, estructura de vistas e implementación de los estilos CSS (`assets/css/estilos.css`).
-* **Gemini:** Utilizado para la estructuración, redacción técnica y estandarización del documento `README.md`.
+* **Claude / Claude Code:** Utilizado como asistente de diseño para la maquetación visual, estructura de vistas e implementación de los estilos CSS (`assets/css/estilos.css`).
+* **Gemini:** Utilizado para la estructuración, redacción técnica, optimización y estandarización del documento `README.md`.
 
 ---
 
